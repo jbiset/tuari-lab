@@ -2,7 +2,7 @@
 
 Entorno Moodle de una organización ficticia de capacitación a distancia para trabajar en Relevamiento, Evaluación e Implementación de Proyectos de la Tecnicatura Universitaria en Administración de Redes Informáticas.
 
-El objetivo es explorar los servicios, reunir evidencias y fundamentar un diagnóstico. La [guía de relevamiento](docs/estudiante.md) propone preguntas y entregables para el trabajo.
+El objetivo es explorar los servicios, reunir evidencias y fundamentar un diagnóstico. La [guía de relevamiento](docs/guía_relevamiento.md) propone preguntas y entregables para el trabajo.
 
 ## Requisitos
 

@@ -4,7 +4,7 @@ Una organización que ofrece capacitación a varias instituciones reporta lentit
 
 ## Acceso y fuentes
 
-El docente entrega las credenciales y el alcance de acceso. Empezar con un estudiante, un docente y la cuenta `relevador`. La administración global queda disponible para inspecciones acompañadas cuando haga falta.
+Las credenciales de acceso están disponibles en el [README](../README.md#accesos). Los perfiles de estudiante, docente, relevador y administrador permiten explorar distintas funciones del campus y comparar sus permisos.
 
 Fuentes disponibles:
 
@@ -16,7 +16,7 @@ Fuentes disponibles:
 
 Los eventos de Moodle incluyen la inicialización del laboratorio. Los datos históricos externos no se presentan como registros recuperados del campus real. Identificar siempre fuente, período, zona horaria y limitaciones de cada evidencia.
 
-## Preguntas iniciales
+## Preguntas guía
 
 1. ¿Qué servicios existen, de qué dependen y quiénes los usan?
 2. ¿Cuántos usuarios están registrados, cuántos participan y qué podemos afirmar sobre concurrencia?
