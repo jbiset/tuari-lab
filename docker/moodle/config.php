@@ -1,0 +1,28 @@
+<?php
+unset($CFG);
+global $CFG;
+$CFG = new stdClass();
+$CFG->dbtype = 'mariadb';
+$CFG->dblibrary = 'native';
+$CFG->dbhost = getenv('DB_HOST') ?: 'db';
+$CFG->dbname = getenv('DB_NAME') ?: 'moodle';
+$CFG->dbuser = getenv('DB_USER') ?: 'moodle';
+$CFG->dbpass = getenv('DB_PASSWORD');
+$CFG->prefix = 'mdl_';
+$CFG->dboptions = ['dbpersist' => false, 'dbport' => 3306, 'dbcollation' => 'utf8mb4_unicode_ci'];
+$CFG->wwwroot = rtrim(getenv('MOODLE_URL') ?: 'http://localhost:8080', '/');
+$CFG->dataroot = '/var/moodledata';
+$CFG->admin = 'admin';
+$CFG->directorypermissions = 02770;
+$CFG->reverseproxy = true;
+$CFG->sslproxy = false;
+$CFG->smtphosts = 'mail:1025';
+$CFG->smtpsecure = '';
+$CFG->smtpauthtype = 'LOGIN';
+$CFG->noreplyaddress = 'noreply@campus.example.test';
+$CFG->noemailever = false;
+$CFG->updateautocheck = false;
+$CFG->disableupdateautodeploy = true;
+$CFG->debug = 0;
+$CFG->debugdisplay = false;
+require_once(__DIR__ . '/lib/setup.php');

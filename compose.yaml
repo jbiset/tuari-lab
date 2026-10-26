@@ -1,0 +1,135 @@
+name: ${COMPOSE_PROJECT_NAME:-tuari-lab}
+
+x-moodle: &moodle
+  image: tuari/moodle:4.5.15-lab1
+  build:
+    context: .
+    dockerfile: docker/moodle/Dockerfile
+  environment: &moodle-env
+    MOODLE_URL: ${MOODLE_URL:-http://localhost:8080}
+    DB_HOST: db
+    DB_NAME: moodle
+    DB_USER: moodle
+    DB_PASSWORD: ${DB_PASSWORD:?Copiar .env.example a .env}
+    ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Completar .env}
+    PARTICIPANT_PASSWORD: ${PARTICIPANT_PASSWORD:?Completar .env}
+    STUDENT_COUNT: ${STUDENT_COUNT:-120}
+    COURSE_COUNT: ${COURSE_COUNT:-12}
+    TEACHER_COUNT: ${TEACHER_COUNT:-6}
+    HISTORY_DAYS: ${HISTORY_DAYS:-56}
+    DATASET_SEED: ${DATASET_SEED:-20261020}
+  volumes:
+    - moodledata:/var/moodledata
+  networks:
+    - backend
+  logging: &logging
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  db:
+    image: mariadb:11.4.5
+    environment:
+      MARIADB_DATABASE: moodle
+      MARIADB_USER: moodle
+      MARIADB_PASSWORD: ${DB_PASSWORD:?Completar .env}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?Completar .env}
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./docker/db/reader.sql:/docker-entrypoint-initdb.d/10-reader.sql:ro
+    networks: [backend]
+    healthcheck:
+      test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+    logging: *logging
+
+  init:
+    <<: *moodle
+    command: ['/opt/tuari/init.sh']
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: 'no'
+
+  moodle:
+    <<: *moodle
+    depends_on:
+      init:
+        condition: service_completed_successfully
+      mail:
+        condition: service_started
+    healthcheck:
+      test: ['CMD', 'curl', '--fail', '--silent', 'http://localhost/health.php']
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    restart: unless-stopped
+
+  cron:
+    <<: *moodle
+    command: ['/opt/tuari/cron.sh']
+    depends_on:
+      moodle:
+        condition: service_healthy
+    restart: unless-stopped
+
+  proxy:
+    image: nginx:1.28-alpine
+    ports:
+      - '127.0.0.1:${MOODLE_PORT:-8080}:80'
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [frontend, backend]
+    depends_on:
+      moodle:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+  mail:
+    image: axllent/mailpit:v1.27.8
+    environment:
+      MP_MAX_MESSAGES: '500'
+    ports:
+      - '127.0.0.1:${MAIL_PORT:-8025}:8025'
+    networks: [backend]
+    restart: unless-stopped
+    logging: *logging
+
+  simulator:
+    image: python:3.13-slim-bookworm
+    profiles: [activity]
+    environment:
+      TARGET_URL: http://proxy
+      PUBLIC_URL: ${MOODLE_URL:-http://localhost:8080}
+      PARTICIPANT_PASSWORD: ${PARTICIPANT_PASSWORD:?Completar .env}
+      STUDENT_COUNT: ${STUDENT_COUNT:-120}
+      SIM_USERS: '4'
+      SIM_ROUNDS: '5'
+      SIM_DELAY: '1'
+    volumes:
+      - ./scripts/simulate.py:/opt/simulate.py:ro
+    command: ['python', '-u', '/opt/simulate.py']
+    networks: [frontend]
+    depends_on:
+      proxy:
+        condition: service_started
+    restart: 'no'
+    logging: *logging
+
+volumes:
+  dbdata:
+  moodledata:
+
+networks:
+  frontend:
+  backend:
+    internal: true
