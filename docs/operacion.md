@@ -18,6 +18,8 @@ Si aparece `permission denied` sobre `docker.sock`, la terminal o sesión necesi
 
 Si el puerto 8080 está ocupado, editar juntos `MOODLE_PORT` y `MOODLE_URL` en `.env`, por ejemplo `8081` y `http://localhost:8081`, y ejecutar `./lab up`. Si ya se cargó contenido con URLs absolutas antiguas, revisar también esas referencias. Para el correo, cambiar `MAIL_PORT`.
 
+Para consultar el correo capturado, abrir `http://127.0.0.1:8025` o el puerto configurado en `MAIL_PORT`. `docker compose ps mail` debe mostrar una publicación como `127.0.0.1:8025->8025/tcp`; mostrar únicamente `8025/tcp` no indica que el puerto esté publicado en el equipo. Si el contenedor conserva una configuración anterior, ejecutar `docker compose up -d --no-deps --force-recreate mail`. La recreación elimina los mensajes de la bandeja temporal.
+
 Si la instalación del esquema quedó parcial, conservar los logs de `init`. Corregir la causa y, si se trata de una copia descartable sin trabajo a conservar, ejecutar el reinicio explícito al final de este documento. No borrar tablas individuales para intentar continuar.
 
 ## Respaldo consistente

@@ -100,7 +100,7 @@ services:
       MP_MAX_MESSAGES: '500'
     ports:
       - '127.0.0.1:${MAIL_PORT:-8025}:8025'
-    networks: [backend]
+    networks: [frontend, backend]
     restart: unless-stopped
     logging: *logging
 
